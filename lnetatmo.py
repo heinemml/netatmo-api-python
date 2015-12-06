@@ -38,7 +38,6 @@ _PASSWORD      = ""   # Your netatmo account password
 
 _BASE_URL            = "https://api.netatmo.net/"
 _AUTH_REQ            = _BASE_URL + "oauth2/token"
-_GETUSER_REQ         = _BASE_URL + "api/getuser"
 _GETSTATIONSDATA_REQ = _BASE_URL + "api/getstationsdata"
 _GETMEASURE_REQ      = _BASE_URL + "api/getmeasure"
 
@@ -87,19 +86,6 @@ class ClientAuth:
 
         return self._accessToken
 
-class User:
-
-    def __init__(self, authData):
-
-        postParams = {
-                "access_token" : authData.accessToken
-                }
-        resp = postRequest(_GETUSER_REQ, postParams)
-        self.rawData = resp['body']
-        self.id = self.rawData['_id']
-        self.devList = self.rawData['devices']
-        self.ownerMail = self.rawData['mail']
-
 class DeviceList:
 
     def __init__(self, authData):
@@ -117,6 +103,10 @@ class DeviceList:
             self.modules.append({ m['_id'] : m for m in data['modules'] })
 
         self.default_station = list(self.stations.values())[0]['station_name']
+        self.user = self.rawData['user']        
+
+    def userData(self):
+        return self.user
 
     def modulesNamesList(self, station=None):
         res = [m['module_name'] for m in self.modules.values()]
