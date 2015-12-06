@@ -36,11 +36,11 @@ _PASSWORD      = ""   # Your netatmo account password
 
 # Common definitions
 
-_BASE_URL       = "https://api.netatmo.net/"
-_AUTH_REQ       = _BASE_URL + "oauth2/token"
-_GETUSER_REQ    = _BASE_URL + "api/getuser"
-_DEVICELIST_REQ = _BASE_URL + "api/devicelist"
-_GETMEASURE_REQ = _BASE_URL + "api/getmeasure"
+_BASE_URL            = "https://api.netatmo.net/"
+_AUTH_REQ            = _BASE_URL + "oauth2/token"
+_GETUSER_REQ         = _BASE_URL + "api/getuser"
+_GETSTATIONSDATA_REQ = _BASE_URL + "api/getstationsdata"
+_GETMEASURE_REQ      = _BASE_URL + "api/getmeasure"
 
 
 class ClientAuth:
@@ -109,10 +109,14 @@ class DeviceList:
                 "access_token" : self.getAuthToken,
                 "app_type" : "app_station"
                 }
-        resp = postRequest(_DEVICELIST_REQ, postParams)
+        resp = postRequest(_GETSTATIONSDATA_REQ, postParams)
         self.rawData = resp['body']
         self.stations = { d['_id'] : d for d in self.rawData['devices'] }
-        self.modules = { m['_id'] : m for m in self.rawData['modules'] }
+        self.modules = list()
+        for index in range(len(self.stations)):
+            self.modules.append({ m['_id'] : m for m in self.rawData['devices'][index]['modules'] })
+        
+
         self.default_station = list(self.stations.values())[0]['station_name']
 
     def modulesNamesList(self, station=None):
@@ -156,10 +160,10 @@ class DeviceList:
             lastD[s['module_name']] = ds.copy()
             lastD[s['module_name']]['When'] = lastD[s['module_name']].pop("time_utc")
             lastD[s['module_name']]['wifi_status'] = s['wifi_status']
-        for mId in s["modules"]:
-            ds = self.modules[mId]['dashboard_data']
+
+        for mod in s["modules"]:
+            ds = mod['dashboard_data']
             if ds['time_utc'] > limit :
-                mod = self.modules[mId]
                 lastD[mod['module_name']] = ds.copy()
                 lastD[mod['module_name']]['When'] = lastD[mod['module_name']].pop("time_utc")
                 # For potential use, add battery and radio coverage information to module data if present
