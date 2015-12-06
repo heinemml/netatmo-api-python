@@ -113,9 +113,8 @@ class DeviceList:
         self.rawData = resp['body']
         self.stations = { d['_id'] : d for d in self.rawData['devices'] }
         self.modules = list()
-        for index in range(len(self.stations)):
-            self.modules.append({ m['_id'] : m for m in self.rawData['devices'][index]['modules'] })
-        
+        for station, data in self.stations.iteritems():
+            self.modules.append({ m['_id'] : m for m in data['modules'] })
 
         self.default_station = list(self.stations.values())[0]['station_name']
 
