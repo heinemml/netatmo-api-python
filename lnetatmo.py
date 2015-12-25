@@ -98,9 +98,12 @@ class DeviceList:
         resp = postRequest(_GETSTATIONSDATA_REQ, postParams)
         self.rawData = resp['body']
         self.stations = { d['_id'] : d for d in self.rawData['devices'] }
-        self.modules = list()
+
+        self.modules = dict()
         for station, data in self.stations.iteritems():
-            self.modules.append({ m['_id'] : m for m in data['modules'] })
+            for m in data['modules']:
+                self.modules[m['_id']] = m
+                self.modules[m['_id']]['main_device'] = station
 
         self.default_station = list(self.stations.values())[0]['station_name']
         self.user = self.rawData['user']        
