@@ -239,7 +239,7 @@ def postRequest(url, params):
         req = urllib.request.Request(url)
         req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
         params = urllib.parse.urlencode(params).encode('utf-8')
-        resp = urllib.request.urlopen(req, params).readall().decode("utf-8")
+        resp = urllib.request.urlopen(req, params).read().decode("utf-8")
     else:
         params = urlencode(params)
         headers = {"Content-Type" : "application/x-www-form-urlencoded;charset=utf-8"}
