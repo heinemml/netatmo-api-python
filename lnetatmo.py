@@ -100,7 +100,7 @@ class DeviceList:
         self.stations = { d['_id'] : d for d in self.rawData['devices'] }
 
         self.modules = dict()
-        for station, data in self.stations.iteritems():
+        for station, data in self.stations.items():
             for m in data['modules']:
                 self.modules[m['_id']] = m
                 self.modules[m['_id']]['main_device'] = station
