@@ -154,13 +154,14 @@ class DeviceList:
             lastD[s['module_name']]['wifi_status'] = s['wifi_status']
 
         for mod in s["modules"]:
-            ds = mod['dashboard_data']
-            if ds['time_utc'] > limit :
-                lastD[mod['module_name']] = ds.copy()
-                lastD[mod['module_name']]['When'] = lastD[mod['module_name']].pop("time_utc")
-                # For potential use, add battery and radio coverage information to module data if present
-                for i in ('battery_vp', 'rf_status') :
-                    if i in mod : lastD[mod['module_name']][i] = mod[i]
+            if 'dashboard_data' in mod:
+                ds = mod['dashboard_data']
+                if ds['time_utc'] > limit :
+                    lastD[mod['module_name']] = ds.copy()
+                    lastD[mod['module_name']]['When'] = lastD[mod['module_name']].pop("time_utc")
+                    # For potential use, add battery and radio coverage information to module data if present
+                    for i in ('battery_vp', 'rf_status') :
+                        if i in mod : lastD[mod['module_name']][i] = mod[i]
         return lastD
 
     def checkNotUpdated(self, station=None, delay=3600):
