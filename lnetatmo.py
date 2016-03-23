@@ -100,7 +100,7 @@ class DeviceList:
         self.stations = { d['_id'] : d for d in self.rawData['devices'] }
 
         self.modules = dict()
-        for station, data in self.stations.iteritems():
+        for station, data in self.stations.items():
             for m in data['modules']:
                 self.modules[m['_id']] = m
                 self.modules[m['_id']]['main_device'] = station
@@ -154,13 +154,14 @@ class DeviceList:
             lastD[s['module_name']]['wifi_status'] = s['wifi_status']
 
         for mod in s["modules"]:
-            ds = mod['dashboard_data']
-            if ds['time_utc'] > limit :
-                lastD[mod['module_name']] = ds.copy()
-                lastD[mod['module_name']]['When'] = lastD[mod['module_name']].pop("time_utc")
-                # For potential use, add battery and radio coverage information to module data if present
-                for i in ('battery_vp', 'rf_status') :
-                    if i in mod : lastD[mod['module_name']][i] = mod[i]
+            if 'dashboard_data' in mod:
+                ds = mod['dashboard_data']
+                if ds['time_utc'] > limit :
+                    lastD[mod['module_name']] = ds.copy()
+                    lastD[mod['module_name']]['When'] = lastD[mod['module_name']].pop("time_utc")
+                    # For potential use, add battery and radio coverage information to module data if present
+                    for i in ('battery_vp', 'rf_status') :
+                        if i in mod : lastD[mod['module_name']][i] = mod[i]
         return lastD
 
     def checkNotUpdated(self, station=None, delay=3600):
@@ -235,7 +236,7 @@ def postRequest(url, params):
         req = urllib.request.Request(url)
         req.add_header("Content-Type","application/x-www-form-urlencoded;charset=utf-8")
         params = urllib.parse.urlencode(params).encode('utf-8')
-        resp = urllib.request.urlopen(req, params).readall().decode("utf-8")
+        resp = urllib.request.urlopen(req, params).read().decode("utf-8")
     else:
         params = urlencode(params)
         headers = {"Content-Type" : "application/x-www-form-urlencoded;charset=utf-8"}
